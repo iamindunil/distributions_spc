@@ -1,7 +1,11 @@
+"use client";
+
 export default function Header() {
-return (
-<div className="h-16 shadow flex items-center px-6 bg-white">
-<h2 className="text-xl font-semibold text-orange-500">SPC Distribution System</h2>
-</div>
-);
+  return (
+    <header className="h-16 bg-white shadow flex items-center justify-between px-6">
+      <h1 className="text-xl md:text-2xl font-bold text-orange-500">
+        SPC Distribution System
+      </h1>
+    </header>
+  );
 }
