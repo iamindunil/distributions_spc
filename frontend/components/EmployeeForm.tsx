@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Employee } from "@/lib/types";
@@ -14,32 +19,32 @@ interface Props {
   employee?: Employee | null;
 }
 
-export default function EmployeeForm({ open, onClose, refresh, employee }: Props) {
-  const [form, setForm] = useState<Employee>({
-    id: 0,
-    name: "",
-    email: "",
-    role: "",
-  });
-
-  useEffect(() => {
-  if (employee) {
-    setForm(employee);
-  }
-}, [employee?.id]);
+export default function EmployeeForm({
+  open,
+  onClose,
+  refresh,
+  employee,
+}: Props) {
+  // Initialize directly from prop (React 19 safe)
+  const [name, setName] = useState(employee?.name ?? "");
+  const [email, setEmail] = useState(employee?.email ?? "");
+  const [role, setRole] = useState(employee?.role ?? "");
 
   const handleSubmit = async () => {
+    const payload = { name, email, role };
+
     if (employee) {
-      await api.updateEmployee(employee.id, form);
+      await api.updateEmployee(employee.id, payload);
     } else {
-      await api.addEmployee(form);
+      await api.addEmployee(payload);
     }
+
     refresh();
     onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose} key={employee?.id ?? "new"}>
       <DialogContent className="bg-white">
         <DialogHeader>
           <DialogTitle className="text-orange-500">
@@ -50,18 +55,18 @@ export default function EmployeeForm({ open, onClose, refresh, employee }: Props
         <div className="space-y-4">
           <Input
             placeholder="Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
           <Input
             placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <Input
             placeholder="Role"
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
           />
 
           <Button className="bg-orange-500 w-full" onClick={handleSubmit}>
