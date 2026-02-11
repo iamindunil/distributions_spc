@@ -19,14 +19,18 @@ export default function EmployeeTable() {
     setEmployees(data);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    await api.deleteEmployee(id);
-    load();
+useEffect(() => {
+  const fetchEmployees = async () => {
+    const data = await api.getEmployees();
+    setEmployees(data);
   };
+
+  fetchEmployees();
+}, []);
+
+  function handleDelete(id: number): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow">

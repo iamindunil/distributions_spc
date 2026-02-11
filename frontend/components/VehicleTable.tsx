@@ -24,14 +24,18 @@ export default function VehicleTable() {
     setVehicles(data);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    await api.deleteVehicle(id);
-    load();
+useEffect(() => {
+  const fetchVehicles = async () => {
+    const data = await api.getVehicles();
+    setVehicles(data);
   };
+
+  fetchVehicles();
+}, []);
+
+    function handleDelete(id: number): void {
+        throw new Error("Function not implemented.");
+    }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow">
