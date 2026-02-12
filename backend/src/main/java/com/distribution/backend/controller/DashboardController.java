@@ -1,8 +1,8 @@
 package com.distribution.backend.controller; 
 
-import com.distribution.dto.DashboardStatsDto;
-import com.distribution.repository.EmployeeRepository;
-import com.distribution.repository.VehicleRepository;
+import com.distribution.backend.dto.DashboardStatsDto;
+import com.distribution.backend.repository.EmployeeRepository;
+import com.distribution.backend.repository.VehicleRepository;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,4 +31,4 @@ public class DashboardController {
     }
 }
     
-}
+
