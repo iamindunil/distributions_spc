@@ -3,28 +3,39 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function Sidebar() {
-  const path = usePathname();
+const links = [
+  { name: "Dashboard", path: "/" },
+  { name: "Employees", path: "/employees" },
+  { name: "Vehicles", path: "/vehicles" },
+  { name: "Logistics", path: "/logistics" },
+  { name: "Reports", path: "/reports" },
+  { name: "Settings", path: "/settings" },
+];
 
-  const linkStyle = (href: string) =>
-    `block px-4 py-2 rounded-lg ${
-      path === href ? "bg-white text-orange-500 font-semibold" : "hover:bg-orange-400"
-    }`;
+export default function Sidebar() {
+  const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-orange-500 text-white p-5 hidden md:block">
-      <h2 className="text-2xl font-bold mb-10">Distribution</h2>
-      <nav className="space-y-3">
-        <Link href="/" className={linkStyle("/")}>
-          Dashboard
-        </Link>
-        <Link href="/employees" className={linkStyle("/employees")}>
-          Employees
-        </Link>
-        <Link href="/vehicles" className={linkStyle("/vehicles")}>
-          Vehicles
-        </Link>
-      </nav>
-    </aside>
+    <div className="w-64 bg-white shadow-md h-screen p-6">
+      <h1 className="text-xl font-bold text-orange-500 mb-6">
+        Distribution SPC
+      </h1>
+
+      <div className="space-y-2">
+        {links.map((link) => (
+          <Link
+            key={link.path}
+            href={link.path}
+            className={`block p-2 rounded-lg transition ${
+              pathname === link.path
+                ? "bg-orange-500 text-white"
+                : "hover:bg-orange-100"
+            }`}
+          >
+            {link.name}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
