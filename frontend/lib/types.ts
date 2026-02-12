@@ -13,3 +13,10 @@ route: string
 status: string
 capacity: number
 }
+
+export interface DashboardStats {
+  totalUsers: number;
+  activeFleets: number;
+  pendingOrders: number;
+  alerts: number;
+}

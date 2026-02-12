@@ -48,4 +48,9 @@ export const api = {
     fetch(`${BASE}/vehicles/${id}`, {
       method: "DELETE",
     }),
+
+    // ================= DASHBOARD =================
+  getDashboardStats: async () =>
+    fetch(`${BASE}/dashboard/stats`).then((r) => r.json()),
+
 };
