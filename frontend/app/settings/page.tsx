@@ -1,26 +1,26 @@
-export default function ReportsPage() {
+export default function SettingsPage() {
   return (
     <div className="p-6">
       <div className="bg-white rounded-2xl shadow-md p-6">
         <h1 className="text-2xl font-bold text-orange-500 mb-4">
-          Reports & Analytics
+          System Settings
         </h1>
 
         <p className="text-gray-600 mb-6">
-          View operational and performance reports.
+          Configure system preferences and application settings.
         </p>
 
         <div className="space-y-4">
           <div className="bg-orange-50 p-4 rounded-xl">
-            Monthly Distribution Summary
+            Notification Preferences
           </div>
 
           <div className="bg-orange-50 p-4 rounded-xl">
-            Vehicle Utilization Report
+            User Roles & Permissions
           </div>
 
           <div className="bg-orange-50 p-4 rounded-xl">
-            Employee Activity Report
+            Security Settings
           </div>
         </div>
       </div>
