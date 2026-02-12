@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DashboardStats } from "@/lib/types";
 import { api } from "@/lib/api";
+import { DashboardStats } from "@/lib/types";
 import {
   BarChart,
   Bar,
@@ -16,7 +16,12 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
-    api.getDashboardStats().then(setStats);
+    const fetchStats = async () => {
+      const data = await api.getDashboardStats();
+      setStats(data);
+    };
+
+    fetchStats();
   }, []);
 
   if (!stats) return <div className="p-6">Loading...</div>;
@@ -30,7 +35,6 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-
       <h1 className="text-2xl font-bold text-orange-500">
         Dashboard Overview
       </h1>
