@@ -1,118 +1,131 @@
-// app/page.tsx  (or app/dashboard/page.tsx)
+// app/page.tsx  (or wherever your dashboard lives)
 "use client";
 
-<QuickActions />
-
-import { useEffect, useState, useCallback } from "react";
-import api from "@/lib/api";
-import { DashboardStats } from "@/lib/types";
-import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+import { Users, Truck, Package, AlertTriangle } from "lucide-react";
 import StatCard from "@/components/StatCard";
-import MetricsBarChart from "@/components/dashboard/MetricsBarChart";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// ... import other components ...
+// Mock data – replace with real API later
+const mockStats = {
+  totalUsers: 1240,
+  activeFleets: 56,
+  pendingOrders: 12,
+  alerts: 3,
+};
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchStats = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get<DashboardStats>("/dashboard/stats"); // adjust endpoint
-      setStats(response.data);
-    } catch (err: any) {
-      console.error("Failed to fetch dashboard stats:", err);
-      setError("Failed to load dashboard data. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [stats, setStats] = useState<typeof mockStats | null>(null);
 
   useEffect(() => {
-    fetchStats();
+    // Simulate API call
+    setTimeout(() => {
+      setStats(mockStats);
+    }, 800);
+  }, []);
 
-    // Optional: auto-refresh every 60 seconds
-    const interval = setInterval(fetchStats, 60000);
-    return () => clearInterval(interval);
-  }, [fetchStats]);
-
-  const handleRefresh = () => {
-    fetchStats();
-  };
-
-  if (loading) {
+  if (!stats) {
     return (
-      <div className="p-6 space-y-8">
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-10 rounded-full" />
+      <div className="p-6 space-y-6">
+        <h1 className="text-2xl font-bold text-orange-600">Dashboard Overview</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i} className="h-36 animate-pulse bg-gray-100" />
+            ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array(4).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-44 rounded-xl" />
-          ))}
-        </div>
-        <Skeleton className="h-80 rounded-xl" />
+        <Card className="h-80 animate-pulse bg-gray-100" />
       </div>
     );
   }
-
-  if (error) {
-    return (
-      <div className="p-6 text-center space-y-4">
-        <p className="text-red-600">{error}</p>
-        <Button onClick={handleRefresh} variant="outline">
-          Try Again
-        </Button>
-      </div>
-    );
-  }
-
-  if (!stats) return null;
 
   const chartData = [
-    { name: "Users",   value: stats.totalUsers,   fill: "#f97316" },
-    { name: "Fleets",  value: stats.activeFleets, fill: "#10b981" },
-    { name: "Orders",  value: stats.pendingOrders,fill: "#3b82f6" },
-    { name: "Alerts",  value: stats.alerts,       fill: "#ef4444" },
+    { name: "Users", value: stats.totalUsers, fill: "#f97316" },
+    { name: "Fleets", value: stats.activeFleets, fill: "#10b981" },
+    { name: "Orders", value: stats.pendingOrders, fill: "#3b82f6" },
+    { name: "Alerts", value: stats.alerts, fill: "#ef4444" },
   ];
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-8">
-      {/* Header with refresh */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Dashboard Overview
-        </h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={loading}
-          className="gap-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          Refresh
-        </Button>
-      </div>
+    <div className="p-4 md:p-6 lg:p-8 space-y-6 lg:space-y-8">
+      <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+        Dashboard Overview
+      </h1>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
-        <StatCard title="Total Users"    value={stats.totalUsers.toLocaleString()}   icon={Users}   color="orange" trend="up"   trendValue="+8% this month" />
-        <StatCard title="Active Fleets"  value={stats.activeFleets}                 icon={Truck}   color="green"  trend="neutral" trendValue="+2 this month" />
-        <StatCard title="Pending Orders" value={stats.pendingOrders}                icon={Package} color="blue"   trend="down"   trendValue="-15% this month" />
-        <StatCard title="Active Alerts"  value={stats.alerts}                       icon={AlertTriangle} color="red" trend="up" trendValue="+1 this month" />
+        <StatCard
+          title="Total Users"
+          value={stats.totalUsers.toLocaleString()}
+          icon={Users}
+          color="orange"
+          trend="up"
+          trendValue="+8%"
+        />
+        <StatCard
+          title="Active Fleets"
+          value={stats.activeFleets}
+          icon={Truck}
+          color="green"
+          trend="neutral"
+          trendValue="+2"
+        />
+        <StatCard
+          title="Pending Orders"
+          value={stats.pendingOrders}
+          icon={Package}
+          color="blue"
+          trend="down"
+          trendValue="-15%"
+        />
+        <StatCard
+          title="Active Alerts"
+          value={stats.alerts}
+          icon={AlertTriangle}
+          color="red"
+          trend="up"
+          trendValue="+1"
+        />
       </div>
 
-      {/* Chart */}
-      <MetricsBarChart data={chartData} title="Key Metrics Comparison" height={340} />
-
-      {/* Next features (Quick Actions, Recent Activity, Tabs) can go here */}
+      {/* Chart Card */}
+      <Card className="shadow-sm border-none">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">
+            Key Metrics Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pl-2">
+          <div className="h-72 md:h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.4} />
+                <XAxis dataKey="name" axisLine={false} tick={{ fill: "#64748b" }} />
+                <YAxis axisLine={false} tick={{ fill: "#64748b" }} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
