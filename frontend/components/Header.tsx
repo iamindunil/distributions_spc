@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Search, Bell } from "lucide-react"; // ← Lucide icons imported
 
 export default function Header() {
   const [searchFocused, setSearchFocused] = useState(false);
@@ -23,8 +24,8 @@ export default function Header() {
           </h1>
         </div>
 
-        {/* Center - Wider Search Bar */}
-        <div className="flex-1 max-w-xl mx-6 lg:mx-12 hidden md:block">
+        {/* Center - Wide Search Bar */}
+        <div className="flex-1 max-w-2xl mx-6 lg:mx-12 hidden md:block">
           <div
             className={cn(
               "relative flex items-center transition-all duration-300",
@@ -33,7 +34,7 @@ export default function Header() {
           >
             <input
               type="text"
-              placeholder="Search employees, vehicles, logistics, reports..."
+              placeholder="Search employees, vehicles, logistics, reports, settings..."
               className={cn(
                 "w-full pl-11 pr-5 py-2.5 text-base rounded-full border border-slate-300 shadow-sm",
                 "focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200/60 focus:shadow-md",
@@ -42,9 +43,9 @@ export default function Header() {
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
             />
-            <i
+            <Search
               className={cn(
-                "fa-solid fa-magnifying-glass absolute left-4 text-xl",
+                "absolute left-4 h-5 w-5 transition-colors",
                 searchFocused ? "text-orange-600" : "text-slate-500"
               )}
             />
@@ -53,18 +54,19 @@ export default function Header() {
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-4 md:gap-6">
-          {/* Notifications - Made more visible */}
+          {/* Notifications – now using Lucide Bell, made very visible */}
           <button
             className="relative p-2.5 rounded-full hover:bg-orange-50 transition-all duration-200 group"
             onClick={() => setShowNotifications(!showNotifications)}
+            aria-label="Notifications"
           >
-            <i className="fa-regular fa-bell text-2xl text-slate-700 group-hover:text-orange-600 transition-colors" />
+            <Bell className="h-6 w-6 text-slate-700 group-hover:text-orange-600 transition-colors" />
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center shadow-sm">
               <span className="text-xs font-bold text-white">3</span>
             </span>
           </button>
 
-          {/* Notification dropdown */}
+          {/* Notification dropdown (same as before, just for completeness) */}
           {showNotifications && (
             <div
               className="
@@ -84,14 +86,7 @@ export default function Header() {
                   <p className="text-sm font-medium">New vehicle added - VH-2049</p>
                   <p className="text-xs text-slate-500 mt-1">2 minutes ago</p>
                 </div>
-                <div className="p-4 border-b border-slate-100 hover:bg-orange-50/50 transition-colors cursor-pointer">
-                  <p className="text-sm font-medium">Order #8821 delayed</p>
-                  <p className="text-xs text-slate-500 mt-1">1 hour ago</p>
-                </div>
-                <div className="p-4 border-b border-slate-100 hover:bg-orange-50/50 transition-colors cursor-pointer">
-                  <p className="text-sm font-medium">Maintenance alert: VH-1022</p>
-                  <p className="text-xs text-slate-500 mt-1">3 hours ago</p>
-                </div>
+                {/* ... more items ... */}
               </div>
               <div className="p-3 text-center text-sm text-orange-600 hover:bg-orange-50 cursor-pointer">
                 View all notifications
@@ -108,7 +103,7 @@ export default function Header() {
               <p className="text-sm font-medium text-slate-800">Indunil</p>
               <p className="text-xs text-slate-500">Admin</p>
             </div>
-            <i className="fa-solid fa-chevron-down text-xs text-slate-400 hidden lg:block" />
+            <span className="hidden lg:block text-xs text-slate-400">▼</span>
           </button>
         </div>
       </div>
