@@ -81,7 +81,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={`https://i.pravatar.cc/150?u=${emp.email}`} alt={emp.name} />
-                      <AvatarFallback>{emp.name[0]}</AvatarFallback>
+                      <AvatarFallback>{emp.name && emp.name.trim() ? emp.name.trim()[0].toUpperCase() : "?"}</AvatarFallback>
                     </Avatar>
                     <span className="font-medium">{emp.name}</span>
                   </div>
