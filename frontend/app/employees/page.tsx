@@ -1,35 +1,32 @@
+// app/employees/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
+import EmployeeTable from "@/components/EmployeeTable";
 import { api } from "@/lib/api";
-
-interface Employee {
-  id: number;
-  name: string;
-  email: string;
-}
+import { Employee } from "@/lib/types";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
 
+  const loadEmployees = async () => {
+    const data = await api.getEmployees();
+    setEmployees(data);
+  };
+
   useEffect(() => {
-    api.getEmployees().then(setEmployees);
+    loadEmployees();
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-orange-500 mb-4">
-        Employees
-      </h1>
-
-      <div className="bg-white rounded-xl shadow p-4">
-        {employees.map((emp) => (
-          <div key={emp.id} className="border-b py-2">
-            <p className="font-semibold">{emp.name}</p>
-            <p className="text-gray-500 text-sm">{emp.email}</p>
-          </div>
-        ))}
+    <div className="p-4 md:p-6 lg:p-8 space-y-6 bg-slate-50 min-h-screen">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+          Employee Management
+        </h1>
+        {/* Optional: Add search or filters here later */}
       </div>
+      <EmployeeTable employees={employees} refresh={loadEmployees} />
     </div>
   );
 }
