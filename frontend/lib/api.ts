@@ -2,9 +2,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Employee, Vehicle, DashboardStats } from "@/lib/types";
 
-// Optional: Show toast on errors (if you have shadcn toast)
-import { toast } from "@/components/ui/use-toast";
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 const api = axios.create({
@@ -12,50 +9,27 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000, // 15 seconds timeout
+  timeout: 15000,
 });
 
-// Optional: Add auth token when you implement login
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
-
-// Global error handler (you can customize messages per endpoint if needed)
+// Optional global error handler
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
-    let message = "An unexpected error occurred";
-
-    if (error.response) {
-      const status = error.response.status;
-      if (status === 400) message = "Invalid request data";
-      else if (status === 401) message = "Unauthorized – please log in";
-      else if (status === 403) message = "You don't have permission";
-      else if (status === 404) message = "Resource not found";
-      else if (status >= 500) message = "Server error – try again later";
-      else message = error.message || "Request failed";
-    } else if (error.request) {
-      message = "No response from server – check your connection";
-    }
-
-    // Show toast notification (optional – comment out if you don't want it)
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: message,
-    });
-
     console.error("[API Error]", error);
+    // Optional toast - comment out if use-toast not installed
+    // import { toast } from "@/components/ui/use-toast";
+    // toast?.({
+    //   variant: "destructive",
+    //   title: "Error",
+    //   description: error.message || "Request failed",
+    // });
     return Promise.reject(error);
   }
 );
 
 export const apiService = {
-  // ================= EMPLOYEES =================
+  // Employees
   getEmployees: async (): Promise<Employee[]> => {
     const res = await api.get<Employee[]>("/employees");
     return res.data;
@@ -66,10 +40,7 @@ export const apiService = {
     return res.data;
   },
 
-  updateEmployee: async (
-    id: number,
-    data: Omit<Employee, "id">
-  ): Promise<Employee> => {
+  updateEmployee: async (id: number, data: Omit<Employee, "id">): Promise<Employee> => {
     const res = await api.put<Employee>(`/employees/${id}`, data);
     return res.data;
   },
@@ -78,7 +49,7 @@ export const apiService = {
     await api.delete(`/employees/${id}`);
   },
 
-  // ================= VEHICLES =================
+  // Vehicles
   getVehicles: async (): Promise<Vehicle[]> => {
     const res = await api.get<Vehicle[]>("/vehicles");
     return res.data;
@@ -89,10 +60,7 @@ export const apiService = {
     return res.data;
   },
 
-  updateVehicle: async (
-    id: number,
-    data: Omit<Vehicle, "id">
-  ): Promise<Vehicle> => {
+  updateVehicle: async (id: number, data: Omit<Vehicle, "id">): Promise<Vehicle> => {
     const res = await api.put<Vehicle>(`/vehicles/${id}`, data);
     return res.data;
   },
@@ -101,13 +69,12 @@ export const apiService = {
     await api.delete(`/vehicles/${id}`);
   },
 
-  // ================= DASHBOARD =================
+  // Dashboard
   getDashboardStats: async (): Promise<DashboardStats> => {
     const res = await api.get<DashboardStats>("/dashboard/stats");
     return res.data;
   },
-
-  // Add more endpoints later (e.g. reports, logistics, auth, etc.)
 };
 
+// Export as default too (so both import styles work)
 export default apiService;
