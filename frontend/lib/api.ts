@@ -26,6 +26,8 @@ export const api = {
       method: "DELETE",
     }),
 
+    
+
   // ================= VEHICLES =================
   getVehicles: async (): Promise<Vehicle[]> =>
     fetch(`${BASE}/vehicles`).then((r) => r.json()),
