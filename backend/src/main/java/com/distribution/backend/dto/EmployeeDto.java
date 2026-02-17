@@ -1,14 +1,14 @@
 package com.distribution.backend.dto;
 
 public class EmployeeDto {
-    private String fullName;
+    private String Name;
     private String email;
     private String role;
     private boolean active;
 
     // Getters & Setters
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getName() { return Name; }
+    public void setName(String Name) { this.Name = Name; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

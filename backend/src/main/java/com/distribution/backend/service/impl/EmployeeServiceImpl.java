@@ -21,7 +21,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee createEmployee(EmployeeDto dto) {
         String employeeId = "EMP-" + (int)(Math.random() * 1000);
-        Employee emp = new Employee(dto.getFullName(), dto.getEmail(), employeeId, dto.getRole(), dto.isActive());
+        Employee emp = new Employee(dto.getName(), dto.getEmail(), employeeId, dto.getRole(), dto.isActive());
         return repository.save(emp);
     }
 
@@ -38,7 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee updateEmployee(Long id, EmployeeDto dto) {
         Employee emp = getEmployeeById(id);
-        emp.setFullName(dto.getFullName());
+        emp.setFullName(dto.getName());
         emp.setEmail(dto.getEmail());
         emp.setRole(dto.getRole());
         emp.setActive(dto.isActive());
