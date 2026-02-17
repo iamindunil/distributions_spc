@@ -15,7 +15,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,7 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import { toast } from "@/components/ui/use-toast"; // optional
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -35,8 +33,11 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
   const [selected, setSelected] = useState<Employee | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const getSafeName = (emp: Employee) => emp.name?.trim() || "Unnamed";
-  const getInitial = (emp: Employee) => getSafeName(emp)[0]?.toUpperCase() || "?";
+  // Helper to safely display name
+  const getDisplayName = (emp: Employee) => {
+    const name = emp.name?.trim();
+    return name && name.length > 0 ? name : "Not Provided";
+  };
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this employee?")) return;
@@ -44,12 +45,10 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
     setDeletingId(id);
     try {
       await apiService.deleteEmployee(id);
-      // toast?.({ title: "Success", description: "Employee deleted" });
       await refresh();
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Failed to delete employee");
-      // toast?.({ variant: "destructive", title: "Error", description: "Delete failed" });
     } finally {
       setDeletingId(null);
     }
@@ -87,23 +86,15 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
                 key={emp.id}
                 className="hover:bg-orange-50/40 transition-colors"
               >
-                <TableCell className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 rounded-full border-2 border-orange-100 shadow-sm">
-                      <AvatarImage
-                        src={`https://i.pravatar.cc/150?u=${emp.email || "unknown"}`}
-                        alt={getSafeName(emp)}
-                      />
-                      <AvatarFallback className="bg-orange-100 text-orange-700 font-semibold">
-                        {getInitial(emp)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium text-slate-900">
-                      {getSafeName(emp)}
-                    </span>
-                  </div>
+                {/* Name – no avatar, just text */}
+                <TableCell className="px-6 py-4 font-medium text-slate-900">
+                  {getDisplayName(emp)}
                 </TableCell>
-                <TableCell className="px-6 py-4 text-slate-600">{emp.email || "—"}</TableCell>
+
+                <TableCell className="px-6 py-4 text-slate-600">
+                  {emp.email || "—"}
+                </TableCell>
+
                 <TableCell className="px-6 py-4">
                   <Badge
                     variant="secondary"
@@ -112,6 +103,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
                     {emp.role || "Not assigned"}
                   </Badge>
                 </TableCell>
+
                 <TableCell className="px-6 py-4">
                   <Badge
                     variant="outline"
@@ -120,6 +112,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
                     Active
                   </Badge>
                 </TableCell>
+
                 <TableCell className="px-6 py-4 text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

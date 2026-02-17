@@ -15,7 +15,17 @@ export default function EmployeesPage() {
     try {
       setLoading(true);
       const data = await apiService.getEmployees();
-      setEmployees(data);
+      
+      // DEBUG: Log the actual data from backend
+      console.log("Fetched employees from backend:", data);
+      // Check if any have missing name
+      data.forEach((emp, index) => {
+        if (!emp.name) {
+          console.warn(`Employee at index ${index} has no name:`, emp);
+        }
+      });
+
+      setEmployees(data || []);
     } catch (err) {
       console.error("Failed to load employees:", err);
     } finally {
