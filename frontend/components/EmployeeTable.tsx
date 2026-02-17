@@ -33,18 +33,25 @@ interface EmployeeTableProps {
 export default function EmployeeTable({ employees, refresh }: EmployeeTableProps) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Employee | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const getSafeName = (emp: Employee) => emp.name?.trim() || "Unnamed";
+  const getInitial = (emp: Employee) => getSafeName(emp)[0]?.toUpperCase() || "?";
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this employee?")) return;
 
+    setDeletingId(id);
     try {
       await apiService.deleteEmployee(id);
-      // toast?.({ title: "Deleted", description: "Employee removed" });
+      // toast?.({ title: "Success", description: "Employee deleted" });
       await refresh();
     } catch (err) {
-      console.error(err);
-      // toast?.({ variant: "destructive", title: "Error", description: "Delete failed" });
+      console.error("Delete failed:", err);
       alert("Failed to delete employee");
+      // toast?.({ variant: "destructive", title: "Error", description: "Delete failed" });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -53,7 +60,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
         <h2 className="text-xl font-bold text-orange-600">Employees</h2>
         <Button
-          className="rounded-xl bg-orange-500 hover:bg-orange-600 gap-2"
+          className="rounded-xl bg-orange-500 hover:bg-orange-600 gap-2 h-10"
           onClick={() => {
             setSelected(null);
             setOpen(true);
@@ -67,57 +74,80 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
-              <TableHead className="px-6 py-4">Name</TableHead>
-              <TableHead className="px-6 py-4">Email</TableHead>
-              <TableHead className="px-6 py-4">Role</TableHead>
-              <TableHead className="px-6 py-4">Status</TableHead>
-              <TableHead className="px-6 py-4 text-right">Actions</TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-slate-700">Name</TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-slate-700">Email</TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-slate-700">Role</TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-slate-700">Status</TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-slate-700 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {employees.map((emp) => (
-              <TableRow key={emp.id} className="hover:bg-orange-50/30 transition-colors">
+              <TableRow
+                key={emp.id}
+                className="hover:bg-orange-50/40 transition-colors"
+              >
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={`https://i.pravatar.cc/150?u=${emp.email}`} alt={emp.name} />
-                      <AvatarFallback>{emp.name && emp.name.trim() ? emp.name.trim()[0].toUpperCase() : "?"}</AvatarFallback>
+                    <Avatar className="h-10 w-10 rounded-full border-2 border-orange-100 shadow-sm">
+                      <AvatarImage
+                        src={`https://i.pravatar.cc/150?u=${emp.email || "unknown"}`}
+                        alt={getSafeName(emp)}
+                      />
+                      <AvatarFallback className="bg-orange-100 text-orange-700 font-semibold">
+                        {getInitial(emp)}
+                      </AvatarFallback>
                     </Avatar>
-                    <span className="font-medium">{emp.name}</span>
+                    <span className="font-medium text-slate-900">
+                      {getSafeName(emp)}
+                    </span>
                   </div>
                 </TableCell>
-                <TableCell className="px-6 py-4 text-slate-600">{emp.email}</TableCell>
+                <TableCell className="px-6 py-4 text-slate-600">{emp.email || "—"}</TableCell>
                 <TableCell className="px-6 py-4">
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-                    {emp.role}
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-100 text-orange-800 hover:bg-orange-200"
+                  >
+                    {emp.role || "Not assigned"}
                   </Badge>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     Active
                   </Badge>
                 </TableCell>
                 <TableCell className="px-6 py-4 text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full hover:bg-orange-100"
+                        disabled={deletingId === emp.id}
+                      >
+                        <MoreHorizontal className="h-4 w-4 text-slate-600" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-lg">
                       <DropdownMenuItem
                         onClick={() => {
                           setSelected(emp);
                           setOpen(true);
                         }}
+                        className="cursor-pointer"
                       >
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-red-600 focus:bg-red-50"
+                        className="text-red-600 focus:bg-red-50 cursor-pointer"
                         onClick={() => handleDelete(emp.id)}
+                        disabled={deletingId === emp.id}
                       >
-                        Delete
+                        {deletingId === emp.id ? "Deleting..." : "Delete"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
