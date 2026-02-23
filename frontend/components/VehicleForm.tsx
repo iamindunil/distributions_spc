@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Vehicle } from "@/lib/types";
 import { apiService } from "@/lib/api";
-
+import { Select } from "@radix-ui/react-select";
 interface VehicleFormProps {
   open: boolean;
   onClose: () => void;
