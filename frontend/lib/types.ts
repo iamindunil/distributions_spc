@@ -7,13 +7,13 @@ export interface Employee {
   active?: boolean;     // optional
 }
 
-
 export interface Vehicle {
-id: number
-driver: string
-route: string
-status: string
-capacity: number
+  id: number;
+  vehicleNumber?: string;   // or plateNumber
+  driver: string;
+  route: string;
+  status: string;
+  capacity: number;
 }
 
 export interface DashboardStats {
