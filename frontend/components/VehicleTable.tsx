@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Vehicle } from "@/lib/types";
-import { api } from "@/lib/api";
+import { apiService } from "@/lib/api";
 import VehicleForm from "./VehicleForm";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,13 +20,13 @@ export default function VehicleTable() {
   const [selected, setSelected] = useState<Vehicle | null>(null);
 
   const load = async () => {
-    const data = await api.getVehicles();
+    const data = await apiService.getVehicles();
     setVehicles(data);
   };
 
 useEffect(() => {
   const fetchVehicles = async () => {
-    const data = await api.getVehicles();
+    const data = await apiService.getVehicles();
     setVehicles(data);
   };
 
