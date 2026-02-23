@@ -12,9 +12,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // ← correct import
 import { Vehicle } from "@/lib/types";
 import { apiService } from "@/lib/api";
-import { Select } from "@radix-ui/react-select";
+
 interface VehicleFormProps {
   open: boolean;
   onClose: () => void;
@@ -60,8 +67,8 @@ export default function VehicleForm({
   }, [open, vehicle]);
 
   const handleChange = (field: keyof typeof formData) => 
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = field === "capacity" ? Number(e.target.value) : e.target.value;
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = field === "capacity" ? Number(e.target.value) || 0 : e.target.value;
       setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -85,7 +92,7 @@ export default function VehicleForm({
       await refresh();
       onClose();
     } catch (error) {
-      console.error(error);
+      console.error("Save failed:", error);
       alert("Failed to save vehicle");
     } finally {
       setIsSubmitting(false);
@@ -111,7 +118,7 @@ export default function VehicleForm({
                 value={formData.vehicleNumber}
                 onChange={handleChange("vehicleNumber")}
                 disabled={isSubmitting}
-                className="h-11 rounded-xl"
+                className="h-11 rounded-xl border-slate-300 focus:border-orange-500 focus:ring-orange-200"
               />
             </div>
 
@@ -123,7 +130,7 @@ export default function VehicleForm({
                 value={formData.driver}
                 onChange={handleChange("driver")}
                 disabled={isSubmitting}
-                className="h-11 rounded-xl"
+                className="h-11 rounded-xl border-slate-300 focus:border-orange-500 focus:ring-orange-200"
               />
             </div>
           </div>
@@ -137,22 +144,23 @@ export default function VehicleForm({
                 value={formData.route}
                 onChange={handleChange("route")}
                 disabled={isSubmitting}
-                className="h-11 rounded-xl"
+                className="h-11 rounded-xl border-slate-300 focus:border-orange-500 focus:ring-orange-200"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="capacity">Load Capacity (%)</Label>
+              <Label htmlFor="capacity">Current Load Capacity (%)</Label>
               <Input
                 id="capacity"
                 type="number"
                 min="0"
                 max="100"
+                step="1"
                 placeholder="e.g. 75"
                 value={formData.capacity}
                 onChange={handleChange("capacity")}
                 disabled={isSubmitting}
-                className="h-11 rounded-xl"
+                className="h-11 rounded-xl border-slate-300 focus:border-orange-500 focus:ring-orange-200"
               />
             </div>
           </div>
@@ -164,7 +172,7 @@ export default function VehicleForm({
               onValueChange={(val) => setFormData((p) => ({ ...p, status: val }))}
               disabled={isSubmitting}
             >
-              <SelectTrigger className="h-11 rounded-xl">
+              <SelectTrigger className="h-11 rounded-xl border-slate-300 focus:border-orange-500 focus:ring-orange-200">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -182,7 +190,7 @@ export default function VehicleForm({
             variant="outline"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-xl"
+            className="rounded-xl border-slate-300 hover:bg-slate-50"
           >
             Cancel
           </Button>
