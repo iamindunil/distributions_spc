@@ -18,10 +18,11 @@ export default function EmployeesPage() {
       
       // DEBUG: Log the actual data from backend
       console.log("Fetched employees from backend:", data);
-      // Check if any have missing name
+
+      // Check if any have missing fullName (updated to fullName)
       data.forEach((emp, index) => {
-        if (!emp.name) {
-          console.warn(`Employee at index ${index} has no name:`, emp);
+        if (!emp.fullName?.trim()) {
+          console.warn(`Employee at index ${index} has no fullName:`, emp);
         }
       });
 
