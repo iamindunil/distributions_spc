@@ -37,24 +37,28 @@ export default function EmployeeForm({
   employee,
 }: EmployeeFormProps) {
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",   // ← key matches backend field
     email: "",
     role: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync form data when dialog opens or employee changes
+  // Sync form when dialog opens or selected employee changes
   useEffect(() => {
-    if (!open) return; // Only run when dialog is open
+    if (!open) return; // Only sync when dialog is visible
 
     if (employee) {
       setFormData({
-        name: employee.name?.trim() ?? "",
+        fullName: employee.fullName?.trim() ?? "",
         email: employee.email?.trim() ?? "",
         role: employee.role ?? "",
       });
     } else {
-      setFormData({ name: "", email: "", role: "" });
+      setFormData({
+        fullName: "",
+        email: "",
+        role: "",
+      });
     }
   }, [open, employee]);
 
@@ -64,12 +68,11 @@ export default function EmployeeForm({
     };
 
   const handleSubmit = async () => {
-    const trimmedName = formData.name.trim();
+    const trimmedFullName = formData.fullName.trim();
     const trimmedEmail = formData.email.trim();
 
-    if (!trimmedName || !trimmedEmail || !formData.role) {
+    if (!trimmedFullName || !trimmedEmail || !formData.role) {
       alert("Please fill all required fields");
-      // toast?.({ variant: "destructive", title: "Error", description: "All fields required" });
       return;
     }
 
@@ -77,10 +80,12 @@ export default function EmployeeForm({
 
     try {
       const payload = {
-        name: trimmedName,
+        fullName: trimmedFullName,   // ← correct key for backend
         email: trimmedEmail,
         role: formData.role,
       };
+
+      console.log("Sending payload:", payload); // ← debug: check what is sent
 
       if (employee?.id) {
         await apiService.updateEmployee(employee.id, payload);
@@ -94,8 +99,7 @@ export default function EmployeeForm({
       onClose();
     } catch (error) {
       console.error("Save failed:", error);
-      alert("Failed to save employee. Please try again.");
-      // toast?.({ variant: "destructive", title: "Error", description: "Failed to save" });
+      alert("Failed to save employee. Please check console for details.");
     } finally {
       setIsSubmitting(false);
     }
@@ -112,14 +116,14 @@ export default function EmployeeForm({
 
         <div className="space-y-6 p-6">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium text-slate-700">
+            <Label htmlFor="fullName" className="text-sm font-medium text-slate-700">
               Full Name *
             </Label>
             <Input
-              id="name"
+              id="fullName"
               placeholder="e.g. Alex Johnson"
-              value={formData.name}
-              onChange={handleChange("name")}
+              value={formData.fullName}
+              onChange={handleChange("fullName")}
               className="h-11 rounded-xl border-slate-300 focus:border-orange-500 focus:ring-orange-200"
               disabled={isSubmitting}
             />

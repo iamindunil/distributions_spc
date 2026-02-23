@@ -33,7 +33,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
   const [selected, setSelected] = useState<Employee | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  // Safe display helpers using fullName (matches backend)
+  // Safe display helpers using fullName
   const getDisplayName = (emp: Employee) => {
     const name = emp.fullName?.trim();
     return name && name.length > 0 ? name : "Not Provided";
@@ -53,7 +53,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
       await refresh();
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete employee. Please try again.");
+      alert("Failed to delete employee");
     } finally {
       setDeletingId(null);
     }
@@ -90,7 +90,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
             {employees.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-12 text-slate-500">
-                  No employees found. Click &quot;Add Employee&quot; to get started.
+                  No employees found. Click "Add Employee" to get started.
                 </TableCell>
               </TableRow>
             ) : (
@@ -99,7 +99,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
                   key={emp.id}
                   className="hover:bg-orange-50/40 transition-colors"
                 >
-                  {/* Name – using fullName from backend */}
+                  {/* Name – using fullName */}
                   <TableCell className="px-6 py-4 font-medium text-slate-900">
                     {getDisplayName(emp)}
                   </TableCell>
