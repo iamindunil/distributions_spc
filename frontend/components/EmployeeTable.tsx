@@ -33,10 +33,15 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
   const [selected, setSelected] = useState<Employee | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  // Helper to safely display name
+  // Safe display helpers using fullName (matches backend)
   const getDisplayName = (emp: Employee) => {
-    const name = emp.name?.trim();
+    const name = emp.fullName?.trim();
     return name && name.length > 0 ? name : "Not Provided";
+  };
+
+  const getDisplayRole = (emp: Employee) => {
+    const role = emp.role?.trim();
+    return role && role.length > 0 ? role : "Not Assigned";
   };
 
   const handleDelete = async (id: number) => {
@@ -48,7 +53,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
       await refresh();
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete employee");
+      alert("Failed to delete employee. Please try again.");
     } finally {
       setDeletingId(null);
     }
@@ -80,73 +85,82 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
               <TableHead className="px-6 py-4 font-semibold text-slate-700 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {employees.map((emp) => (
-              <TableRow
-                key={emp.id}
-                className="hover:bg-orange-50/40 transition-colors"
-              >
-                {/* Name – no avatar, just text */}
-                <TableCell className="px-6 py-4 font-medium text-slate-900">
-                  {getDisplayName(emp)}
-                </TableCell>
-
-                <TableCell className="px-6 py-4 text-slate-600">
-                  {emp.email || "—"}
-                </TableCell>
-
-                <TableCell className="px-6 py-4">
-                  <Badge
-                    variant="secondary"
-                    className="bg-orange-100 text-orange-800 hover:bg-orange-200"
-                  >
-                    {emp.role || "Not assigned"}
-                  </Badge>
-                </TableCell>
-
-                <TableCell className="px-6 py-4">
-                  <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
-                  >
-                    Active
-                  </Badge>
-                </TableCell>
-
-                <TableCell className="px-6 py-4 text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full hover:bg-orange-100"
-                        disabled={deletingId === emp.id}
-                      >
-                        <MoreHorizontal className="h-4 w-4 text-slate-600" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-lg">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelected(emp);
-                          setOpen(true);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-600 focus:bg-red-50 cursor-pointer"
-                        onClick={() => handleDelete(emp.id)}
-                        disabled={deletingId === emp.id}
-                      >
-                        {deletingId === emp.id ? "Deleting..." : "Delete"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {employees.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-12 text-slate-500">
+                  No employees found. Click &quot;Add Employee&quot; to get started.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              employees.map((emp) => (
+                <TableRow
+                  key={emp.id}
+                  className="hover:bg-orange-50/40 transition-colors"
+                >
+                  {/* Name – using fullName from backend */}
+                  <TableCell className="px-6 py-4 font-medium text-slate-900">
+                    {getDisplayName(emp)}
+                  </TableCell>
+
+                  <TableCell className="px-6 py-4 text-slate-600">
+                    {emp.email?.trim() || "—"}
+                  </TableCell>
+
+                  <TableCell className="px-6 py-4">
+                    <Badge
+                      variant="secondary"
+                      className="bg-orange-100 text-orange-800 hover:bg-orange-200"
+                    >
+                      {getDisplayRole(emp)}
+                    </Badge>
+                  </TableCell>
+
+                  <TableCell className="px-6 py-4">
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200"
+                    >
+                      Active
+                    </Badge>
+                  </TableCell>
+
+                  <TableCell className="px-6 py-4 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full hover:bg-orange-100"
+                          disabled={deletingId === emp.id}
+                        >
+                          <MoreHorizontal className="h-4 w-4 text-slate-600" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-lg">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelected(emp);
+                            setOpen(true);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-red-600 focus:bg-red-50 cursor-pointer"
+                          onClick={() => handleDelete(emp.id)}
+                          disabled={deletingId === emp.id}
+                        >
+                          {deletingId === emp.id ? "Deleting..." : "Delete"}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

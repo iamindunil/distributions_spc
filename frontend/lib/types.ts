@@ -1,8 +1,10 @@
 export interface Employee {
-id: number
-name: string
-email: string
-role: string
+  id: number;
+  fullName: string;     // ← changed from name to fullName
+  email: string;
+  role: string;
+  employeeId?: string;  // optional
+  active?: boolean;     // optional
 }
 
 
