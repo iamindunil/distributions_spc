@@ -21,7 +21,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Employee } from "@/lib/types";
 import { apiService } from "@/lib/api";
-// import { toast } from "@/components/ui/use-toast"; // Uncomment when toast is installed
 
 interface EmployeeFormProps {
   open: boolean;
@@ -37,15 +36,15 @@ export default function EmployeeForm({
   employee,
 }: EmployeeFormProps) {
   const [formData, setFormData] = useState({
-    fullName: "",   // ← key matches backend field
+    fullName: "",
     email: "",
     role: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync form when dialog opens or selected employee changes
+  // Sync form data when dialog opens or employee changes
   useEffect(() => {
-    if (!open) return; // Only sync when dialog is visible
+    if (!open) return;
 
     if (employee) {
       setFormData({
@@ -80,26 +79,24 @@ export default function EmployeeForm({
 
     try {
       const payload = {
-        fullName: trimmedFullName,   // ← correct key for backend
+        fullName: trimmedFullName,  // ← matches backend field
         email: trimmedEmail,
         role: formData.role,
       };
 
-      console.log("Sending payload:", payload); // ← debug: check what is sent
+      console.log("Sending payload to backend:", payload); // Debug – remove later if you want
 
       if (employee?.id) {
         await apiService.updateEmployee(employee.id, payload);
-        // toast?.({ title: "Success", description: "Employee updated" });
       } else {
         await apiService.addEmployee(payload);
-        // toast?.({ title: "Success", description: "Employee added" });
       }
 
       await refresh();
       onClose();
     } catch (error) {
       console.error("Save failed:", error);
-      alert("Failed to save employee. Please check console for details.");
+      alert("Failed to save employee. Check console for details.");
     } finally {
       setIsSubmitting(false);
     }

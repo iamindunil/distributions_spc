@@ -90,7 +90,7 @@ export default function EmployeeTable({ employees, refresh }: EmployeeTableProps
             {employees.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-12 text-slate-500">
-                  No employees found. Click "Add Employee" to get started.
+                  No employees found. Click &quot;Add Employee&quot; to get started.
                 </TableCell>
               </TableRow>
             ) : (
