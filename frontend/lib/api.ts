@@ -1,33 +1,63 @@
 // lib/api.ts
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { Employee, Vehicle, DashboardStats } from "@/lib/types";
 
+// Use environment variable with fallback (for dev/prod)
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
+// Create axios instance
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000,
+  timeout: 15000, // 15 seconds
 });
 
-// Optional global error handler
+// Optional: Add auth token interceptor (uncomment when you have authentication)
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  // Example: const token = localStorage.getItem("token");
+  // if (token) {
+  //   config.headers.Authorization = `Bearer ${token}`;
+  // }
+  return config;
+});
+
+// Global response error handler
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
-    console.error("[API Error]", error);
-    // Optional toast - comment out if use-toast not installed
+    let message = "An unexpected error occurred";
+
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 400) message = "Invalid request data";
+      else if (status === 401) message = "Unauthorized – please log in";
+      else if (status === 403) message = "Forbidden – insufficient permissions";
+      else if (status === 404) message = "Resource not found";
+      else if (status >= 500) message = "Server error – please try again later";
+      else message = error.message || "Request failed";
+    } else if (error.request) {
+      message = "No response from server – check your internet connection";
+    } else {
+      message = error.message || "Unknown error";
+    }
+
+    // Optional: toast notification (uncomment when toast is set up)
     // import { toast } from "@/components/ui/use-toast";
     // toast?.({
     //   variant: "destructive",
     //   title: "Error",
-    //   description: error.message || "Request failed",
+    //   description: message,
     // });
+
+    console.error("[API Error]", { message, error });
+
     return Promise.reject(error);
   }
 );
 
+// Service object with typed methods
 export const apiService = {
   // Employees
   getEmployees: async (): Promise<Employee[]> => {
@@ -74,7 +104,9 @@ export const apiService = {
     const res = await api.get<DashboardStats>("/dashboard/stats");
     return res.data;
   },
+
+  // Add more endpoints as needed (e.g. reports, auth, notifications)
 };
 
-// Export as default too (so both import styles work)
+// Also export as default (allows both import styles)
 export default apiService;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { apiService } from "@/lib/api";
 import { Vehicle } from "@/lib/types";
 
 export default function VehiclesPage() {
@@ -9,7 +9,7 @@ export default function VehiclesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getVehicles()
+    apiService.getVehicles()
       .then(setVehicles)
       .finally(() => setLoading(false));
   }, []);
