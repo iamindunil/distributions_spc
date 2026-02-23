@@ -44,4 +44,10 @@ public class VehicleController {
         service.deleteVehicle(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/logistics/stats")
+    public ResponseEntity<LogisticsStatsDto> getLogisticsStats() {
+        LogisticsStatsDto stats = vehicleService.getLogisticsStats();
+        return ResponseEntity.ok(stats);
+    }
 }
