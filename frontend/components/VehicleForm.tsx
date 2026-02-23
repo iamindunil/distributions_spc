@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Vehicle } from "@/lib/types";
-import { api } from "@/lib/api";
+import { apiService } from "@/lib/api";
 
 interface Props {
   open: boolean;
@@ -34,9 +34,9 @@ export default function VehicleForm({
     const payload = { driver, route, status, capacity };
 
     if (vehicle) {
-      await api.updateVehicle(vehicle.id, payload);
+      await apiService.updateVehicle(vehicle.id, payload);
     } else {
-      await api.addVehicle(payload);
+      await apiService.addVehicle(payload);
     }
 
     refresh();
