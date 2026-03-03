@@ -49,7 +49,7 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle updateVehicle(Long id, VehicleDto dto) {
         Vehicle vehicle = getVehicleById(id);
 
-        // Partial update - only update fields that are provided
+        // Partial update - only update provided fields
         if (dto.getDriver() != null && !dto.getDriver().trim().isEmpty()) {
             vehicle.setDriver(dto.getDriver().trim());
         }
@@ -78,30 +78,31 @@ public class VehicleServiceImpl implements VehicleService {
         repository.deleteById(id);
     }
 
-    @Override
-    public LogisticsStatsDto getLogisticsStats() {
-        List<Vehicle> allVehicles = repository.findAll();
+@Override
+public LogisticsStatsDto getLogisticsStats() {
+    List<Vehicle> allVehicles = repository.findAll();
 
-        long activeRoutes = allVehicles.stream()
-                .filter(v -> "In Transit".equalsIgnoreCase(v.getStatus()))
-                .count();
+    long activeRoutes = allVehicles.stream()
+            .filter(v -> "In Transit".equalsIgnoreCase(v.getStatus()))
+            .count();
 
-        long vehiclesOnDuty = allVehicles.stream()
-                .filter(v -> !"Idle".equalsIgnoreCase(v.getStatus()) &&
-                             !"Maintenance".equalsIgnoreCase(v.getStatus()))
-                .count();
+    long vehiclesOnDuty = allVehicles.stream()
+            .filter(v -> !"Idle".equalsIgnoreCase(v.getStatus()) &&
+                         !"Maintenance".equalsIgnoreCase(v.getStatus()))
+            .count();
 
-        // TODO: Replace with real logic when you have Delivery/Order entity
-        long pendingDeliveries = 23;   // Mock value - update later
-        long delayedDeliveries = 4;    // Mock value - update later
+    // TODO: Replace with real data when you have Delivery/Order entity
+    long pendingDeliveries = 23;   // Mock - update later
+    long delayedDeliveries = 4;    // Mock - update later
 
-        return new LogisticsStatsDto(
-                (int) activeRoutes,
-                (int) vehiclesOnDuty,
-                (int) pendingDeliveries,
-                (int) delayedDeliveries
-        );
-    }
+    // This now matches the constructor you just added
+    return new LogisticsStatsDto(
+            (int) activeRoutes,
+            (int) vehiclesOnDuty,
+            (int) pendingDeliveries,
+            (int) delayedDeliveries, 0
+    );
+}
 
     // Bonus method - useful for filtering in logistics dashboard
     public List<Vehicle> getVehiclesByStatus(String status) {

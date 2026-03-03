@@ -1,6 +1,7 @@
 package com.distribution.backend.controller;
 
 import com.distribution.backend.dto.VehicleDto;
+import com.distribution.backend.dto.LogisticsStatsDto;
 import com.distribution.backend.entity.Vehicle;
 import com.distribution.backend.service.VehicleService;
 import org.springframework.http.ResponseEntity;
@@ -45,9 +46,10 @@ public class VehicleController {
         return ResponseEntity.noContent().build();
     }
 
+    // FIXED: use 'service' (your field name), not 'vehicleService'
     @GetMapping("/logistics/stats")
     public ResponseEntity<LogisticsStatsDto> getLogisticsStats() {
-        LogisticsStatsDto stats = vehicleService.getLogisticsStats();
+        LogisticsStatsDto stats = service.getLogisticsStats();
         return ResponseEntity.ok(stats);
     }
 }

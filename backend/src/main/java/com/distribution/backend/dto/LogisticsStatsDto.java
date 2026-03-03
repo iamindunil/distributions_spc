@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LogisticsStatsDto {
 
-    private static final long serialVersionUID = 1L;
-
     @JsonProperty("totalVehicles")
     private int totalVehicles;
 
@@ -21,7 +19,7 @@ public class LogisticsStatsDto {
     @JsonProperty("delayedDeliveries")
     private int delayedDeliveries;
 
-    // Constructor matching your original usage
+    // FIXED: Add this constructor to match the call in VehicleServiceImpl
     public LogisticsStatsDto(int totalVehicles, int activeVehicles,
                              int totalRoutes, int onTimeDeliveries,
                              int delayedDeliveries) {
@@ -32,58 +30,30 @@ public class LogisticsStatsDto {
         this.delayedDeliveries = delayedDeliveries;
     }
 
-    // Default constructor
+    // Default constructor (optional but good to have)
     public LogisticsStatsDto() {
     }
 
     // Getters & Setters
-    public int getTotalVehicles() {
-        return totalVehicles;
-    }
+    public int getTotalVehicles() { return totalVehicles; }
+    public void setTotalVehicles(int totalVehicles) { this.totalVehicles = totalVehicles; }
 
-    public void setTotalVehicles(int totalVehicles) {
-        this.totalVehicles = totalVehicles;
-    }
+    public int getActiveVehicles() { return activeVehicles; }
+    public void setActiveVehicles(int activeVehicles) { this.activeVehicles = activeVehicles; }
 
-    public int getActiveVehicles() {
-        return activeVehicles;
-    }
+    public int getTotalRoutes() { return totalRoutes; }
+    public void setTotalRoutes(int totalRoutes) { this.totalRoutes = totalRoutes; }
 
-    public void setActiveVehicles(int activeVehicles) {
-        this.activeVehicles = activeVehicles;
-    }
+    public int getOnTimeDeliveries() { return onTimeDeliveries; }
+    public void setOnTimeDeliveries(int onTimeDeliveries) { this.onTimeDeliveries = onTimeDeliveries; }
 
-    public int getTotalRoutes() {
-        return totalRoutes;
-    }
+    public int getDelayedDeliveries() { return delayedDeliveries; }
+    public void setDelayedDeliveries(int delayedDeliveries) { this.delayedDeliveries = delayedDeliveries; }
 
-    public void setTotalRoutes(int totalRoutes) {
-        this.totalRoutes = totalRoutes;
-    }
-
-    public int getOnTimeDeliveries() {
-        return onTimeDeliveries;
-    }
-
-    public void setOnTimeDeliveries(int onTimeDeliveries) {
-        this.onTimeDeliveries = onTimeDeliveries;
-    }
-
-    public int getDelayedDeliveries() {
-        return delayedDeliveries;
-    }
-
-    public void setDelayedDeliveries(int delayedDeliveries) {
-        this.delayedDeliveries = delayedDeliveries;
-    }
-
-    // Optional: computed success rate (percentage)
+    // Optional: success rate
     public double getDeliverySuccessRate() {
         int total = onTimeDeliveries + delayedDeliveries;
-        if (total == 0) {
-            return 0.0;
-        }
-        return (double) onTimeDeliveries / total * 100;
+        return total == 0 ? 0.0 : (double) onTimeDeliveries / total * 100;
     }
 
     @Override
