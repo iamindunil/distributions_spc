@@ -1,29 +1,30 @@
 // lib/api.ts
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { Employee, Vehicle, DashboardStats } from "@/lib/types";
+import { Employee, Vehicle, DashboardStats, Route, Delivery, LogisticsStats } from "@/lib/types";
 
-// Use environment variable with fallback (for dev/prod)
+// Base URL from environment or fallback to localhost
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
-// Create axios instance
+// Axios instance
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000, // 15 seconds
+  timeout: 15000, // 15 seconds timeout
 });
 
-// Optional: Add auth token interceptor (uncomment when you have authentication)
+// Request interceptor (optional: auth token)
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // Example: const token = localStorage.getItem("token");
+  // Uncomment when you implement login/JWT
+  // const token = localStorage.getItem("token");
   // if (token) {
   //   config.headers.Authorization = `Bearer ${token}`;
   // }
   return config;
 });
 
-// Global response error handler
+// Response error handler
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
@@ -38,28 +39,25 @@ api.interceptors.response.use(
       else if (status >= 500) message = "Server error – please try again later";
       else message = error.message || "Request failed";
     } else if (error.request) {
-      message = "No response from server – check your internet connection";
+      message = "No response from server – check your connection";
     } else {
       message = error.message || "Unknown error";
     }
 
-    // Optional: toast notification (uncomment when toast is set up)
+    // Optional toast (uncomment when you add shadcn toast)
     // import { toast } from "@/components/ui/use-toast";
-    // toast?.({
-    //   variant: "destructive",
-    //   title: "Error",
-    //   description: message,
-    // });
+    // toast?.({ variant: "destructive", title: "Error", description: message });
 
     console.error("[API Error]", { message, error });
-
     return Promise.reject(error);
   }
 );
 
-// Service object with typed methods
+// API service methods (typed responses)
 export const apiService = {
+  // ──────────────────────────────────────────────
   // Employees
+  // ──────────────────────────────────────────────
   getEmployees: async (): Promise<Employee[]> => {
     const res = await api.get<Employee[]>("/employees");
     return res.data;
@@ -79,7 +77,9 @@ export const apiService = {
     await api.delete(`/employees/${id}`);
   },
 
+  // ──────────────────────────────────────────────
   // Vehicles
+  // ──────────────────────────────────────────────
   getVehicles: async (): Promise<Vehicle[]> => {
     const res = await api.get<Vehicle[]>("/vehicles");
     return res.data;
@@ -99,14 +99,68 @@ export const apiService = {
     await api.delete(`/vehicles/${id}`);
   },
 
+  // ──────────────────────────────────────────────
   // Dashboard
+  // ──────────────────────────────────────────────
   getDashboardStats: async (): Promise<DashboardStats> => {
     const res = await api.get<DashboardStats>("/dashboard/stats");
     return res.data;
   },
 
-  // Add more endpoints as needed (e.g. reports, auth, notifications)
+  // ──────────────────────────────────────────────
+  // Routes (NEW)
+  // ──────────────────────────────────────────────
+  getRoutes: async (): Promise<Route[]> => {
+    const res = await api.get<Route[]>("/routes");
+    return res.data;
+  },
+
+  addRoute: async (data: Omit<Route, "id">): Promise<Route> => {
+    const res = await api.post<Route>("/routes", data);
+    return res.data;
+  },
+
+  updateRoute: async (id: number, data: Omit<Route, "id">): Promise<Route> => {
+    const res = await api.put<Route>(`/routes/${id}`, data);
+    return res.data;
+  },
+
+  deleteRoute: async (id: number): Promise<void> => {
+    await api.delete(`/routes/${id}`);
+  },
+
+  // ──────────────────────────────────────────────
+  // Deliveries (NEW)
+  // ──────────────────────────────────────────────
+  getDeliveries: async (): Promise<Delivery[]> => {
+    const res = await api.get<Delivery[]>("/deliveries");
+    return res.data;
+  },
+
+  addDelivery: async (data: Omit<Delivery, "id">): Promise<Delivery> => {
+    const res = await api.post<Delivery>("/deliveries", data);
+    return res.data;
+  },
+
+  updateDelivery: async (id: number, data: Omit<Delivery, "id">): Promise<Delivery> => {
+    const res = await api.put<Delivery>(`/deliveries/${id}`, data);
+    return res.data;
+  },
+
+  deleteDelivery: async (id: number): Promise<void> => {
+    await api.delete(`/deliveries/${id}`);
+  },
+
+  // ──────────────────────────────────────────────
+  // Logistics Stats (from VehicleController)
+  // ──────────────────────────────────────────────
+  getLogisticsStats: async (): Promise<LogisticsStats> => {
+    const res = await api.get<LogisticsStats>("/vehicles/logistics/stats");
+    return res.data;
+  },
+
+  // Add more endpoints later (reports, notifications, auth, etc.)
 };
 
-// Also export as default (allows both import styles)
+// Export default (allows import api from "@/lib/api")
 export default apiService;
