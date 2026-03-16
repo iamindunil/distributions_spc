@@ -1,6 +1,6 @@
 // lib/api.ts
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { Employee, Vehicle, DashboardStats, Route, Delivery, LogisticsStats } from "@/lib/types";
+import { Employee, Vehicle, DashboardStats, Route, Delivery, LogisticsStats, Distributor } from "@/lib/types";
 
 // Base URL from environment or fallback to localhost
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
@@ -14,7 +14,7 @@ const api = axios.create({
   timeout: 15000, // 15 seconds timeout
 });
 
-// Request interceptor (add JWT token when logged in)
+// Request interceptor – automatically adds JWT token if present
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -23,7 +23,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// Response error handler
+// Response error handler – detailed logging and user-friendly messages
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
@@ -38,45 +38,46 @@ api.interceptors.response.use(
       else if (status >= 500) message = "Server error – please try again later";
       else message = error.message || "Request failed";
     } else if (error.request) {
-      message = "No response from server – check your connection";
+      message = "No response from server – check your connection or backend status";
     } else {
       message = error.message || "Unknown error";
     }
 
-    // Optional: show toast notification (uncomment when you add shadcn toast)
+    // Optional: toast notification (uncomment when you add shadcn toast)
     // import { toast } from "@/components/ui/use-toast";
     // toast?.({ variant: "destructive", title: "Error", description: message });
 
-    console.error("[API Error]", { message, error });
+    console.error("[API Error]", { message, error, status: error.response?.status });
     return Promise.reject(error);
   }
 );
 
-// API service methods (typed responses)
+// API service methods (all typed responses)
 export const apiService = {
   // ──────────────────────────────────────────────
   // Authentication
   // ──────────────────────────────────────────────
   login: async (email: string, password: string): Promise<{ token: string; role: string; email: string }> => {
-  const res = await api.post<{ token: string; role: string; email: string }>("/auth/login", {
-    email,
-    password,
-  });
-  return res.data;
-},
+    const res = await api.post<{ token: string; role: string; email: string }>("/auth/login", {
+      email,
+      password,
+    });
+    return res.data;
+  },
 
-registerDistributor: async (data: {
-  email: string;
-  password: string;
-  businessName: string;
-  ownerName?: string;
-  address?: string;
-  phone?: string;
-  registrationNumber?: string;
-}): Promise<{ message: string }> => {
-  const res = await api.post<{ message: string }>("/auth/register", data);
-  return res.data;
-},
+  registerDistributor: async (data: {
+    email: string;
+    password: string;
+    businessName: string;
+    ownerName?: string;
+    address?: string;
+    phone?: string;
+    registrationNumber?: string;
+  }): Promise<{ message: string }> => {
+    const res = await api.post<{ message: string }>("/auth/register", data);
+    return res.data;
+  },
+
   // ──────────────────────────────────────────────
   // Employees
   // ──────────────────────────────────────────────
@@ -171,6 +172,36 @@ registerDistributor: async (data: {
 
   deleteDelivery: async (id: number): Promise<void> => {
     await api.delete(`/deliveries/${id}`);
+  },
+
+  // ──────────────────────────────────────────────
+  // Distributors (Admin only)
+  // ──────────────────────────────────────────────
+  getDistributors: async (): Promise<Distributor[]> => {
+    const res = await api.get<Distributor[]>("/distributors");
+    return res.data;
+  },
+
+  addDistributor: async (data: Omit<Distributor, "id">): Promise<Distributor> => {
+    const res = await api.post<Distributor>("/distributors", data);
+    return res.data;
+  },
+
+  updateDistributor: async (id: number, data: Omit<Distributor, "id">): Promise<Distributor> => {
+    const res = await api.put<Distributor>(`/distributors/${id}`, data);
+    return res.data;
+  },
+
+  approveDistributor: async (id: number): Promise<void> => {
+    await api.put(`/distributors/${id}/approve`);
+  },
+
+  rejectDistributor: async (id: number): Promise<void> => {
+    await api.put(`/distributors/${id}/reject`);
+  },
+
+  deleteDistributor: async (id: number): Promise<void> => {
+    await api.delete(`/distributors/${id}`);
   },
 
   // ──────────────────────────────────────────────
