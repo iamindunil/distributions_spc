@@ -14,13 +14,12 @@ const api = axios.create({
   timeout: 15000, // 15 seconds timeout
 });
 
-// Request interceptor (optional: auth token)
+// Request interceptor (add JWT token when logged in)
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // Uncomment when you implement login/JWT
-  // const token = localStorage.getItem("token");
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
@@ -44,40 +43,40 @@ api.interceptors.response.use(
       message = error.message || "Unknown error";
     }
 
-    // Optional toast (uncomment when you add shadcn toast)
+    // Optional: show toast notification (uncomment when you add shadcn toast)
     // import { toast } from "@/components/ui/use-toast";
     // toast?.({ variant: "destructive", title: "Error", description: message });
 
     console.error("[API Error]", { message, error });
     return Promise.reject(error);
   }
-
-  // Auth
-login: async (email: string, password: string): Promise<any> => {
-  const res = await api.post("/auth/login", { email, password });
-  return res.data;
-},
-
-registerDistributor: async (data: any): Promise<any> => {
-  const res = await api.post("/auth/register", data);
-  return res.data;
-},
-
-// Distributors (admin)
-getDistributors: async (): Promise<Distributor[]> => {
-  const res = await api.get<Distributor[]>("/distributors");
-  return res.data;
-},
-
-approveDistributor: async (id: number): Promise<void> => {
-  await api.put(`/distributors/${id}/approve`);
-},
-
-// Add more as needed
 );
 
 // API service methods (typed responses)
 export const apiService = {
+  // ──────────────────────────────────────────────
+  // Authentication
+  // ──────────────────────────────────────────────
+  login: async (email: string, password: string): Promise<{ token: string; role: string; email: string }> => {
+  const res = await api.post<{ token: string; role: string; email: string }>("/auth/login", {
+    email,
+    password,
+  });
+  return res.data;
+},
+
+registerDistributor: async (data: {
+  email: string;
+  password: string;
+  businessName: string;
+  ownerName?: string;
+  address?: string;
+  phone?: string;
+  registrationNumber?: string;
+}): Promise<{ message: string }> => {
+  const res = await api.post<{ message: string }>("/auth/register", data);
+  return res.data;
+},
   // ──────────────────────────────────────────────
   // Employees
   // ──────────────────────────────────────────────
@@ -131,7 +130,7 @@ export const apiService = {
   },
 
   // ──────────────────────────────────────────────
-  // Routes (NEW)
+  // Routes
   // ──────────────────────────────────────────────
   getRoutes: async (): Promise<Route[]> => {
     const res = await api.get<Route[]>("/routes");
@@ -153,7 +152,7 @@ export const apiService = {
   },
 
   // ──────────────────────────────────────────────
-  // Deliveries (NEW)
+  // Deliveries
   // ──────────────────────────────────────────────
   getDeliveries: async (): Promise<Delivery[]> => {
     const res = await api.get<Delivery[]>("/deliveries");
@@ -175,14 +174,14 @@ export const apiService = {
   },
 
   // ──────────────────────────────────────────────
-  // Logistics Stats (from VehicleController)
+  // Logistics Stats
   // ──────────────────────────────────────────────
   getLogisticsStats: async (): Promise<LogisticsStats> => {
     const res = await api.get<LogisticsStats>("/vehicles/logistics/stats");
     return res.data;
   },
 
-  // Add more endpoints later (reports, notifications, auth, etc.)
+  // Add more endpoints later (reports, notifications, etc.)
 };
 
 // Export default (allows import api from "@/lib/api")
