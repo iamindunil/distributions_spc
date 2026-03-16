@@ -10,10 +10,10 @@ const navItems = [
   { href: "/employees", label: "Employees",  icon: "fa-users"          },
   { href: "/vehicles",  label: "Vehicles",   icon: "fa-truck"          },
   { href: "/logistics", label: "Logistics",  icon: "fa-truck-fast"     },
+  { href: "/distributors", label: "Distributors", icon: "fa-handshake" },  // ← NEW
   { href: "/reports",   label: "Reports",    icon: "fa-file-invoice"   },
   { href: "/settings",  label: "Settings",   icon: "fa-gear"           },
-];
-
+  ];
 export default function Sidebar() {
   const pathname = usePathname();
 
