@@ -38,6 +38,3 @@ public class Distributor {
     private boolean active = true;
 }
 
-public enum DistributorStatus {
-    PENDING, APPROVED, REJECTED
-}

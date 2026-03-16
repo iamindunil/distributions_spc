@@ -64,3 +64,15 @@ export interface Activity {
   timestamp: string;
   user?: string;
 }
+
+export interface Distributor {
+  id: number;
+  email: string;
+  businessName: string;
+  ownerName?: string;
+  address?: string;
+  phone?: string;
+  registrationNumber?: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  active: boolean;
+}

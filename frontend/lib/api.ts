@@ -51,6 +51,29 @@ api.interceptors.response.use(
     console.error("[API Error]", { message, error });
     return Promise.reject(error);
   }
+
+  // Auth
+login: async (email: string, password: string): Promise<any> => {
+  const res = await api.post("/auth/login", { email, password });
+  return res.data;
+},
+
+registerDistributor: async (data: any): Promise<any> => {
+  const res = await api.post("/auth/register", data);
+  return res.data;
+},
+
+// Distributors (admin)
+getDistributors: async (): Promise<Distributor[]> => {
+  const res = await api.get<Distributor[]>("/distributors");
+  return res.data;
+},
+
+approveDistributor: async (id: number): Promise<void> => {
+  await api.put(`/distributors/${id}/approve`);
+},
+
+// Add more as needed
 );
 
 // API service methods (typed responses)
